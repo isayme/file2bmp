@@ -11,3 +11,8 @@ Usage
 For windows, double click the script and follow the prompt message.
 
 For Unix/Linux, with a shell and type command "python file2bmp.py", then follow the prompt message.
+
+Todo List
+=========
+
+- [ ] delete the test file
