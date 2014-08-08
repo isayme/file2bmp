@@ -23,10 +23,9 @@ def file2bmp(src_file, dst_file, xpixel = 200):
     src_file_size = src_file_stat.st_size;
 
     dst_file_width = xpixel;
-    dst_file_height = ((src_file_size + 2)/3 + dst_file_width - 1)/dst_file_width;
-    dst_file_bytesline = (dst_file_width + 3)/4*4;
-    
-    #src_file_size = (src_file_size + xpixel - 1) / xpixel * xpixel;
+    dst_file_bytesline = (dst_file_width + 3)/4*4*3;
+    dst_file_height = (src_file_size + dst_file_bytesline - 1)/dst_file_bytesline;
+
     dst_file_size = dst_file_height * dst_file_bytesline * 3;
     dst_file_size = dst_file_size + BMP_FILE_HEAD_LEN;
 
@@ -34,6 +33,7 @@ def file2bmp(src_file, dst_file, xpixel = 200):
     filehead[0] = "B";
     filehead[1] = "M";
     filehead[2:6] = struct.pack("L", dst_file_size);
+    filehead[6:10] = struct.pack("L", 0);
     filehead[10:14] = struct.pack("L", BMP_FILE_HEAD_LEN);
 
     # info head
@@ -43,7 +43,8 @@ def file2bmp(src_file, dst_file, xpixel = 200):
     infohead[12:14] = struct.pack("H", 1);
     infohead[14:16] = struct.pack("H", 24);
     infohead[16:20] = struct.pack("L", 0);
-    infohead[20:24] = struct.pack("L", dst_file_height*dst_file_bytesline);
+    infohead[20:24] = struct.pack("L", 0);
+    infohead[24:32] = struct.pack("Q", 0);
     infohead[32:36] = struct.pack("L", 0);
     infohead[36:40] = struct.pack("L", 0);
 
@@ -52,13 +53,14 @@ def file2bmp(src_file, dst_file, xpixel = 200):
     fp.write(filehead);
     fp.write(infohead);
     fp.write(open(src_file, "rb").read());
-    if (dst_file_height*dst_file_bytesline*3 > src_file_size):
-        zeros = bytearray(dst_file_height*dst_file_bytesline*3 - src_file_size);
+    if (dst_file_height*dst_file_bytesline > src_file_size):
+        zeros = bytearray(dst_file_height*dst_file_bytesline - src_file_size);
         fp.write(zeros);
     fp.close();
     
 if __name__ == "__main__":
-    src_file = raw_input("Input src_file name : ");
-    dst_file = raw_input("Input dst_file name : ");
-    file2bmp(src_file, dst_file);
+    # src_file = raw_input("Input src_file name : ");
+    # dst_file = raw_input("Input dst_file name : ");
+    # file2bmp(src_file, dst_file);
+    file2bmp("test.zip", "test.bmp", 40);
     
